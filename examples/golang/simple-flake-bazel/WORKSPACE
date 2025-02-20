@@ -1,0 +1,50 @@
+workspace(name = "my_go_project")
+
+local_repository(
+    name = "go_sdk",
+    path = "/nix/store/05saqcgidraqmn4z82prsp7rbj9hjmwm-go-1.22.5/bin/go",  # Sostituisci con il percorso corretto del Go SDK nel tuo ambiente Nix
+)
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Regole per Bazel Go
+http_archive(
+    name = "io_bazel_rules_go",
+    urls = ["https://github.com/bazelbuild/rules_go/releases/download/v0.29.0/rules_go-v0.29.0.zip"],
+    sha256 = "2b1641428dff9018f9e85c0384f03ec6c10660d935b750e3fa1492a281a53b0f",
+)
+
+http_archive(
+    name = "bazel_gazelle",
+    urls = ["https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.37.0/bazel-gazelle-v0.37.0.tar.gz"],
+    sha256 = "d76bf7a60fd8b050444090dfa2837a4eaf9829e1165618ee35dceca5cbdf58d5",
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_toolchains")
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+
+go_rules_dependencies()
+# go_register_toolchains("host")
+gazelle_dependencies()
+
+# Registra le toolchain
+register_toolchains("//toolchain:go_toolchain")
+
+# Definisci le toolchain manualmente
+# toolchain(
+#     name = "go_toolchain",
+#     toolchain_type = "@io_bazel_rules_go//go:toolchain",
+#     exec_compatible_with = [],
+#     target_compatible_with = [],
+#     toolchain = "@go_sdk//:go_toolchain",
+# )
+
+# # Definisci il Go SDK
+# go_register_toolchains(
+#     go_version = "1.22.5",
+#     go_sdk = "@go_sdk//:go_sdk",
+)
+
+# load("@go_sdk//:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+# go_rules_dependencies()
+# go_register_toolchains()
